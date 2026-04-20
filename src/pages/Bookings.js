@@ -16,7 +16,7 @@ function Bookings() {
       setMinLoadingFinished(true);
     }, 5000);
     return () => clearTimeout(timer);
-  }, []);
+  }, [setMinLoadingFinished]);
 
   useEffect(() => {
     if (!currentUser) {
@@ -35,7 +35,7 @@ function Bookings() {
     };
 
     fetchBookings();
-  }, [currentUser, navigate, loadUserBookings]);
+  }, [currentUser, navigate, loadUserBookings, setLoading]);
 
   const getStatusColor = useCallback((status) => {
     switch (status) {

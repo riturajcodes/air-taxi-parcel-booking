@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { useRecentBooking } from '../hooks/useRecentBooking';
@@ -11,7 +11,7 @@ const BookingSummary = () => {
   const statusLabel = useBookingStatusLabel(recentBooking);
   const [countdownText, setCountdownText] = useState('');
 
-  const getCountdownText = (booking) => {
+  const getCountdownText = useCallback((booking) => {
     if (!booking) return '';
     const now = new Date();
     const arrivalTime = new Date(booking.arrivalTime);
@@ -47,7 +47,7 @@ const BookingSummary = () => {
     }
 
     return `${action} in ${timeStr} by ${booking.pilotName}`;
-  };
+  }, [statusLabel]);
 
   useEffect(() => {
     const updateCountdown = () => {
@@ -58,7 +58,7 @@ const BookingSummary = () => {
     const interval = setInterval(updateCountdown, 1000); // Update every second
 
     return () => clearInterval(interval);
-  }, [recentBooking, statusLabel]);
+  }, [recentBooking, getCountdownText]);
 
   if (!currentUser || location.pathname === '/bookings' || !recentBooking) {
     return null;

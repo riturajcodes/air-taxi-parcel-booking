@@ -1,6 +1,6 @@
 # Shunya: Premium Urban Air Mobility & High-Priority Logistics
 
-Shunya is a high-performance, glassmorphism-inspired booking platform for the next generation of eVTOL (Electric Vertical Take-off and Landing) air taxis and cargo drones.
+Shunya is a high-performance, booking platform for the next generation of eVTOL (Electric Vertical Take-off and Landing) air taxis and cargo drones.
 
 ## 1. The Real-World Problem: "The Gridlock Trap"
 
@@ -33,11 +33,8 @@ Current aviation is geared towards long distances (city-to-city). Current ground
 
 ## Technical Highlights
 
-- **Glassmorphism UI:** A premium aesthetic using `backdrop-blur` and high-transparency layers to mimic the "airy" feel of flight.
 - **Performance Optimized:** Utilizing `React.lazy` and `Suspense` for code splitting, and `useMemo`/`useCallback` for expensive distance calculations.
 - **Real-time Simulation:** A custom status engine that transitions bookings from `confirmed` to `completed` based on real-time flight metrics.
 - **Localized Pricing:** Optimized for the Indian market with INR (₹) currency handling and realistic distance-based fare structures.
 
 ---
-
-_Developed as a world-class proof of concept for the future of Indian Urban Air Mobility._

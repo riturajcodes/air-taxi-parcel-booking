@@ -1,7 +1,7 @@
-import React, { createContext, useContext, useState, useEffect, useCallback, useMemo } from 'react';
+import React, { createContext, useContext, useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import { useAuth } from './AuthContext';
 import { db } from '../services/firebase';
-import { collection, addDoc, getDocs, doc, updateDoc, query, where, orderBy } from 'firebase/firestore';
+import { collection, addDoc, getDocs, doc, updateDoc, query, where } from 'firebase/firestore';
 
 const BookingContext = createContext();
 
@@ -9,24 +9,32 @@ export function useBooking() {
   return useContext(BookingContext);
 }
 
+// Pilot names for random assignment
+const pilotNames = [
+  'Captain Rajesh Kumar',
+  'Captain Priya Sharma',
+  'Captain Amit Singh',
+  'Captain Sunita Patel',
+  'Captain Vikram Rao',
+  'Captain Meera Joshi',
+  'Captain Arjun Nair',
+  'Captain Kavita Reddy'
+];
+
 export function BookingProvider({ children }) {
   const { currentUser } = useAuth();
   const [bookings, setBookings] = useState([]);
   const [currentBooking, setCurrentBooking] = useState(null);
   const [loading, setLoading] = useState(false);
-  const [statusIntervals, setStatusIntervals] = useState(new Map()); // Store interval IDs
+  const statusIntervalsRef = useRef(new Map());
+  const bookingsRef = useRef(bookings);
+  const currentBookingRef = useRef(currentBooking);
 
-  // Pilot names for random assignment
-  const pilotNames = [
-    'Captain Rajesh Kumar',
-    'Captain Priya Sharma',
-    'Captain Amit Singh',
-    'Captain Sunita Patel',
-    'Captain Vikram Rao',
-    'Captain Meera Joshi',
-    'Captain Arjun Nair',
-    'Captain Kavita Reddy'
-  ];
+  // Keep refs in sync with state for stable callbacks
+  useEffect(() => {
+    bookingsRef.current = bookings;
+    currentBookingRef.current = currentBooking;
+  }, [bookings, currentBooking]);
 
   // Create a new booking
   const createBooking = useCallback(async (bookingData) => {
@@ -75,7 +83,7 @@ export function BookingProvider({ children }) {
     } finally {
       setLoading(false);
     }
-  }, [currentUser, pilotNames, bookings, currentBooking]);
+  }, [currentUser, startBookingStatusUpdates]);
 
   // Calculate fare based on vehicle type and distance
   const calculateFare = useCallback((vehicleType, distance) => {
@@ -91,15 +99,15 @@ export function BookingProvider({ children }) {
 
   // Start status updates for a booking
   const startBookingStatusUpdates = useCallback((bookingId) => {
-    // Clear existing interval if any
-    if (statusIntervals.has(bookingId)) {
-      clearInterval(statusIntervals.get(bookingId));
+    // Clear existing interval using ref to keep identity stable
+    if (statusIntervalsRef.current.has(bookingId)) {
+      clearInterval(statusIntervalsRef.current.get(bookingId));
     }
 
     const updateStatus = async () => {
       try {
         const bookingRef = doc(db, 'bookings', bookingId);
-        const booking = bookings.find(b => b.id === bookingId) || currentBooking;
+        const booking = bookingsRef.current.find(b => b.id === bookingId) || currentBookingRef.current;
 
         if (!booking) return;
 
@@ -148,11 +156,11 @@ export function BookingProvider({ children }) {
     // Initial update
     updateStatus();
 
-    // Store interval ID
-    setStatusIntervals(prev => new Map(prev).set(bookingId, interval));
+    // Store interval ID in ref
+    statusIntervalsRef.current.set(bookingId, interval);
 
     return interval;
-  }, [bookings, currentBooking, statusIntervals]);
+  }, [updateLocalBooking]);
 
   // Update local booking state
   const updateLocalBooking = useCallback((bookingId, newStatus) => {

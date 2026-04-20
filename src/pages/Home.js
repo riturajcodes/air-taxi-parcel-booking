@@ -72,7 +72,7 @@ function Home() {
 
   const searchTimeout = useRef(null);
 
-  const fetchAddresses = async (query, setSuggestions) => {
+  const fetchAddresses = useCallback(async (query, setSuggestions) => {
     if (query.length < 2) {
       setSuggestions([]);
       return;
@@ -91,7 +91,7 @@ function Home() {
     } catch (error) {
       console.error('Error fetching addresses:', error);
     }
-  };
+  }, []);
 
   const debouncedFetchAddresses = useCallback((query, setSuggestions) => {
     if (searchTimeout.current) {
@@ -100,7 +100,7 @@ function Home() {
     searchTimeout.current = setTimeout(() => {
       fetchAddresses(query, setSuggestions);
     }, 500); // 500ms debounce
-  }, []);
+  }, [fetchAddresses]);
 
   const handleUseCurrentLocation = useCallback(() => {
     if (navigator.geolocation) {

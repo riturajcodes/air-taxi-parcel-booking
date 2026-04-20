@@ -29,7 +29,7 @@ const BookingDetail = () => {
       setMinLoadingFinished(true);
     }, 1000);
     return () => clearTimeout(timer);
-  }, []);
+  }, [setMinLoadingFinished]);
 
   useEffect(() => {
     if (!currentUser) {
@@ -95,9 +95,9 @@ const BookingDetail = () => {
   const getStatusText = (status) => {
     switch (status) {
       case 'confirmed': return 'Confirmed';
-      case 'pilot_assigned': return 'Pilot Assigned';
+      case 'pilot_assigned': return 'Captain Assigned';
       case 'in_transit': return 'In Transit';
-      case 'arrived': return 'Arrived';
+      case 'arrived': return 'Touchdown';
       case 'completed': return 'Completed';
       default: return status;
     }
@@ -116,7 +116,7 @@ const BookingDetail = () => {
           {/* Header */}
           <div className="bg-white/60 backdrop-blur-xl border border-white/80 rounded-[32px] shadow-xl p-8 mb-6">
             <div className="flex items-center justify-between mb-4">
-              <h1 className="text-3xl font-black text-slate-900 tracking-tight">Booking Details</h1>
+              <h1 className="text-3xl font-black text-slate-900 tracking-tighter">Booking Details</h1>
               <span className={`px-3 py-1 rounded-full text-sm font-medium ${getStatusColor(booking.status)}`}>
                 {getStatusText(booking.status)}
               </span>
