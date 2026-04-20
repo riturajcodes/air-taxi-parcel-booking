@@ -47,7 +47,7 @@ function Account() {
   }
 
   return (
-    <div className="min-h-screen bg-white pt-32 pb-60 px-6">
+    <div className="min-h-screen bg-white pt-32 pb-80 px-6">
       <div className="max-w-3xl mx-auto">
         <header className="mb-16">
           <h2 className="text-5xl font-black text-slate-900 tracking-tighter mb-4">Your Hangar</h2>

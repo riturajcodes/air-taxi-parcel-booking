@@ -111,7 +111,7 @@ const BookingDetail = () => {
 
   return (
     <div className="min-h-screen bg-slate-50">
-      <div className="container mx-auto px-4 pt-8 pb-60">
+      <div className="container mx-auto px-4 pt-8 pb-80">
         <div className="max-w-4xl mx-auto">
           {/* Header */}
           <div className="bg-white/60 backdrop-blur-xl border border-white/80 rounded-[32px] shadow-xl p-8 mb-6">

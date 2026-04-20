@@ -81,7 +81,7 @@ function Home() {
       const response = await fetch(`https://photon.komoot.io/api/?q=${encodeURIComponent(query)}&limit=5`);
       const data = await response.json();
       const suggestions = data.features.map(f => {
-        const { name, city, state, country } = f.properties;
+        const { name, city, state } = f.properties;
         return {
           label: [name, city, state].filter(Boolean).join(', '),
           coords: { lat: f.geometry.coordinates[1], lng: f.geometry.coordinates[0] }

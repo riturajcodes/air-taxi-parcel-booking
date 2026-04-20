@@ -36,66 +36,30 @@ export function BookingProvider({ children }) {
     currentBookingRef.current = currentBooking;
   }, [bookings, currentBooking]);
 
-  // Create a new booking
-  const createBooking = useCallback(async (bookingData) => {
-    if (!currentUser) {
-      throw new Error('User must be logged in to create a booking');
-    }
-
-    setLoading(true);
-    try {
-      const now = new Date();
-      const arrivalTime = new Date(now.getTime() + (Math.random() * 15 + 5) * 60000); // 5-20 minutes
-      const dropoffTime = new Date(arrivalTime.getTime() + (bookingData.distance * 0.8 + 2) * 60000); // Mock flight time
-
-      const fullBookingData = {
-        userId: currentUser.uid,
-        userEmail: currentUser.email,
-        vehicleType: bookingData.vehicleType,
-        pickup: bookingData.pickup,
-        dropoff: bookingData.dropoff,
-        passengers: bookingData.passengers,
-        flightNumber: bookingData.flightNumber,
-        flightDate: bookingData.flightDate.toISOString(),
-        distance: bookingData.distance,
-        pilotName: pilotNames[Math.floor(Math.random() * pilotNames.length)],
-        arrivalTime: arrivalTime.toISOString(),
-        dropoffTime: dropoffTime.toISOString(),
-        status: 'confirmed', // confirmed, pilot_assigned, in_transit, arrived, completed
-        fare: bookingData.fare,
-        createdAt: now.toISOString(),
-        updatedAt: now.toISOString()
-      };
-
-      const docRef = await addDoc(collection(db, 'bookings'), fullBookingData);
-      const newBooking = { id: docRef.id, ...fullBookingData };
-
-      setCurrentBooking(newBooking);
-      setBookings(prev => [newBooking, ...prev]);
-
-      // Start status updates
-      startBookingStatusUpdates(newBooking.id);
-
-      return newBooking.id;
-    } catch (error) {
-      console.error('Error creating booking:', error);
-      throw error;
-    } finally {
-      setLoading(false);
-    }
-  }, [currentUser, startBookingStatusUpdates]);
-
   // Calculate fare based on vehicle type and distance
-  const calculateFare = useCallback((vehicleType, distance) => {
-    const baseRates = {
-      'Shunya Standard': { base: 500, perMile: 5 },
-      'Shunya Luxury': { base: 1200, perMile: 12 },
-      'Shunya Cargo': { base: 400, perMile: 4 }
-    };
+//   const calculateFare = useCallback((vehicleType, distance) => {
+//     const baseRates = {
+//       'Shunya Standard': { base: 500, perMile: 5 },
+//       'Shunya Luxury': { base: 1200, perMile: 12 },
+//       'Shunya Cargo': { base: 400, perMile: 4 }
+//     };
 
-    const rate = baseRates[vehicleType];
-    return Math.round((rate.base + distance * rate.perMile) * 100) / 100;
-  }, []);
+//     const rate = baseRates[vehicleType];
+//     return Math.round((rate.base + distance * rate.perMile) * 100) / 100;
+//   }, []);
+
+  // Update local booking state
+  const updateLocalBooking = useCallback((bookingId, newStatus) => {
+    setBookings(prev => prev.map(booking =>
+      booking.id === bookingId
+        ? { ...booking, status: newStatus, updatedAt: new Date().toISOString() }
+        : booking
+    ));
+
+    if (currentBooking && currentBooking.id === bookingId) {
+      setCurrentBooking(prev => ({ ...prev, status: newStatus, updatedAt: new Date().toISOString() }));
+    }
+  }, [currentBooking]);
 
   // Start status updates for a booking
   const startBookingStatusUpdates = useCallback((bookingId) => {
@@ -162,18 +126,54 @@ export function BookingProvider({ children }) {
     return interval;
   }, [updateLocalBooking]);
 
-  // Update local booking state
-  const updateLocalBooking = useCallback((bookingId, newStatus) => {
-    setBookings(prev => prev.map(booking =>
-      booking.id === bookingId
-        ? { ...booking, status: newStatus, updatedAt: new Date().toISOString() }
-        : booking
-    ));
-
-    if (currentBooking && currentBooking.id === bookingId) {
-      setCurrentBooking(prev => ({ ...prev, status: newStatus, updatedAt: new Date().toISOString() }));
+  // Create a new booking
+  const createBooking = useCallback(async (bookingData) => {
+    if (!currentUser) {
+      throw new Error('User must be logged in to create a booking');
     }
-  }, [currentBooking]);
+
+    setLoading(true);
+    try {
+      const now = new Date();
+      const arrivalTime = new Date(now.getTime() + (Math.random() * 15 + 5) * 60000); // 5-20 minutes
+      const dropoffTime = new Date(arrivalTime.getTime() + (bookingData.distance * 0.8 + 2) * 60000); // Mock flight time
+
+      const fullBookingData = {
+        userId: currentUser.uid,
+        userEmail: currentUser.email,
+        vehicleType: bookingData.vehicleType,
+        pickup: bookingData.pickup,
+        dropoff: bookingData.dropoff,
+        passengers: bookingData.passengers,
+        flightNumber: bookingData.flightNumber,
+        flightDate: bookingData.flightDate.toISOString(),
+        distance: bookingData.distance,
+        pilotName: pilotNames[Math.floor(Math.random() * pilotNames.length)],
+        arrivalTime: arrivalTime.toISOString(),
+        dropoffTime: dropoffTime.toISOString(),
+        status: 'confirmed', // confirmed, pilot_assigned, in_transit, arrived, completed
+        fare: bookingData.fare,
+        createdAt: now.toISOString(),
+        updatedAt: now.toISOString()
+      };
+
+      const docRef = await addDoc(collection(db, 'bookings'), fullBookingData);
+      const newBooking = { id: docRef.id, ...fullBookingData };
+
+      setCurrentBooking(newBooking);
+      setBookings(prev => [newBooking, ...prev]);
+
+      // Start status updates
+      startBookingStatusUpdates(newBooking.id);
+
+      return newBooking.id;
+    } catch (error) {
+      console.error('Error creating booking:', error);
+      throw error;
+    } finally {
+      setLoading(false);
+    }
+  }, [currentUser, startBookingStatusUpdates]);
 
   // Load user's bookings
   const loadUserBookings = useCallback(async () => {
@@ -258,7 +258,7 @@ export function BookingProvider({ children }) {
       setBookings([]);
       setCurrentBooking(null);
     }
-  }, [currentUser]);
+  }, [currentUser, loadUserBookings]);
 
   const value = useMemo(() => ({
     bookings,
@@ -277,8 +277,7 @@ export function BookingProvider({ children }) {
     updateBookingStatus,
     cancelBooking,
     loadUserBookings,
-    setCurrentBookingById,
-    calculateFare
+    setCurrentBookingById
   ]);
 
   return (

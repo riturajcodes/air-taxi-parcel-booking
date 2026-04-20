@@ -60,9 +60,9 @@ function Login() {
           {/* Terms */}
           <div className="mt-8 text-center text-xs text-gray-400">
             By continuing, you agree to our{' '}
-            <a href="#" className="text-blue-600 hover:text-blue-500">Terms of Service</a>
+            <button type="button" className="text-blue-600 hover:text-blue-500 underline">Terms of Service</button>
             {' '}and{' '}
-            <a href="#" className="text-blue-600 hover:text-blue-500">Privacy Policy</a>
+            <button type="button" className="text-blue-600 hover:text-blue-500 underline">Privacy Policy</button>
           </div>
         </div>
       </div>

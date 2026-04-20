@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useMemo, useCallback } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useBooking } from '../context/BookingContext';
 import { useAuth } from '../context/AuthContext';
@@ -68,7 +68,7 @@ function Bookings() {
   }
 
   return (
-    <div className="min-h-screen bg-[radial-gradient(circle_at_top_right,_var(--tw-gradient-stops))] from-sky-100 via-white to-white pt-24 pb-32 px-6 w-full">
+    <div className="min-h-screen bg-[radial-gradient(circle_at_top_right,_var(--tw-gradient-stops))] from-sky-100 via-white to-white pt-24 pb-40 px-6 w-full">
       <h2 className="text-4xl font-black text-slate-900 mb-10 tracking-tighter">My Bookings</h2>
       {bookings.length === 0 ? (
         <div className="bg-white/40 backdrop-blur-xl rounded-3xl p-12 text-center border border-white/60 shadow-xl">
